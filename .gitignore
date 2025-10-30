@@ -1,1 +1,54 @@
-tf_env
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+tf_env/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb_meta.json
+
+# Data / cache
+*.csv
+*.tsv
+*.log
+*.pkl
+*.pickle
+*.h5
+*.parquet
+*.db
+*.sqlite3
+
+# Panel / Bokeh temporary files
+*.bk
+*.bokeh
+*.html
+*.json
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# VSCode / IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Tests
+.coverage
+htmlcov/
+.tox/
+pytest_cache/
