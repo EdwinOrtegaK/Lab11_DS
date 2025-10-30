@@ -1,0 +1,10 @@
+pandas
+numpy
+panel
+holoviews
+hvplot
+bokeh
+plotly
+scikit-learn
+statsmodels
+tensorflow
