@@ -26,6 +26,33 @@ def _pretty_hover(plot, element):
             t.mode = "vline"
             t.point_policy = "snap_to_data"
 
+COLOR_BY_BASE = {
+    'Regular': '#1f77b4',
+    'Superior': '#ff7f0e',
+    'Diesel':   '#2ca02c',
+}
+
+def _style_for(colname: str):
+    try:
+        base, suf = colname.split('_', 1)
+    except ValueError:
+        base, suf = colname, ''
+    color = COLOR_BY_BASE.get(base, '#1f77b4')
+    dash  = 'dashed' if suf.lower().startswith('con') else 'solid'
+    return color, dash
+
+def _legend_tweak(plot, element):
+    fig = plot.state
+    if getattr(fig, "legend", None):
+        lg = fig.legend[0]
+        lg.location = "top_left"
+        lg.title = "Variable"
+        lg.background_fill_alpha = 0.85
+        lg.border_line_color = "lightgray"
+        lg.spacing = 2
+        lg.label_text_font_size = "10pt"
+        lg.title_text_font_style = "bold"
+
 # Widgets auxiliares
 def series_selector(df: pd.DataFrame):
     """Checkbox de series numéricas (excluye 'fecha')."""
@@ -105,19 +132,39 @@ def panorama_view(df: pd.DataFrame, series_w, range_w, freq_w, epoch_w):
         sub  = agg.loc[mask, ['fecha'] + list(series_sel)]
 
         # Plot principal
-        main = sub.hvplot(
-            x='fecha', y=series_sel, height=320, width=900,
-            tools=['hover']
-        ).opts(
+        curves, scatters = [], []
+        for col in series_sel:
+            if col not in sub.columns:
+                continue
+            color, dash = _style_for(col)
+
+            c = sub.hvplot(
+                x='fecha', y=col, kind='line',
+                color=color, line_dash=dash, line_width=2,
+                height=400, width=1000,
+                label=col, tools=['hover']
+            )
+            p = sub.hvplot.scatter(
+                x='fecha', y=col,
+                color=color, size=4, alpha=0.85,
+                legend=False, tools=['hover']
+            )
+            curves.append(c); scatters.append(p)
+
+        main = (hv.Overlay(curves) * hv.Overlay(scatters)).opts(
+            width=1000, height=400,
             ylabel='Importación',
             yticks=6,
             yformatter=NumeralTickFormatter(format="0,0"),
-            hooks=[_pretty_hover] 
+            show_legend=True,
+            legend_position='top_left',
+            legend_muted=False,
+            hooks=[_pretty_hover, _legend_tweak],
         )
 
         return pn.Column(
             _right_header("1) Panorama temporal"),
-            main
+            pn.pane.HoloViews(main, width=1000, height=400, sizing_mode='fixed')
         )
 
     return pn.Column(_view)
