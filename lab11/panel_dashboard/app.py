@@ -12,6 +12,7 @@ from src.visuals.tabla import metrics_table_view
 from src.visuals.caja_violin import caja_violin_view          
 from src.visuals.real_predicho import real_predicho_view
 from src.visuals.anomalias import anomalias_view, ANOMALY_STATE
+from src.visuals.desempeno import desempeno_view, MODELS_STATE
 
 
 df = load_combustibles()
@@ -33,6 +34,7 @@ barras   = barras_apiladas_view(df, w_series, w_dates)            # V3
 caja_violin = caja_violin_view(df, w_series, w_dates)             # V4
 anomalias = anomalias_view(df, w_series, w_dates)                 # V5
 real_predicho = real_predicho_view(df, w_series, w_dates)         # V6
+desempeno = desempeno_view(df, w_series, w_dates)                 # V7
 tabla    = metrics_table_view(df, w_series, w_dates)              # V8
 
 template = pn.template.MaterialTemplate(
@@ -45,6 +47,7 @@ template = pn.template.MaterialTemplate(
         pn.Row(caja_violin), 
         pn.Row(anomalias),
         pn.Row(real_predicho), 
+        pn.Row(desempeno),
         pn.Row(tabla)
     ]
 )

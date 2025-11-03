@@ -5,8 +5,14 @@ import panel as pn
 import holoviews as hv
 import hvplot.pandas
 from bokeh.models import HoverTool, NumeralTickFormatter
+import param
 
 hv.extension("bokeh")
+
+class _ModelsState(param.Parameterized):
+    selected = param.List(default=[])
+
+MODELS_STATE = _ModelsState()
 
 COLOR_BY_BASE = {'Regular': '#1f77b4', 'Superior': '#ff7f0e', 'Diesel': '#2ca02c'}
 
@@ -53,7 +59,13 @@ def real_predicho_view(df: pd.DataFrame, series_w, range_w):
     modelos = ["Naive","S-Naive(12)"]
     if _HAS_SM: modelos.append("Holt-Winters")
 
-    model_w = pn.widgets.CheckBoxGroup(name="Modelos", options=modelos, value=["Naive","S-Naive(12)"])
+    model_w = pn.widgets.CheckBoxGroup(name="Modelos", options=modelos, value=["Naive"])
+    MODELS_STATE.selected = list(model_w.value)
+
+    @pn.depends(model_w.param.value, watch=True)
+    def _sync_selected(models):
+        # Mantén sincronizado el estado compartido con las checkboxes
+        MODELS_STATE.selected = list(models)
 
     @pn.depends(series_w.param.value, range_w.param.value_throttled, model_w.param.value)
     def _view(series_sel, dr, modelos_sel):
